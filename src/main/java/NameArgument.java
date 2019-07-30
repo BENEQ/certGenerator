@@ -1,8 +1,8 @@
 import lombok.Getter;
 
 public enum NameArgument {
-    tsFile(true, "TrueStoreFile", " path to file with truestore, default truestore.jks"),
-    tsPass(true, "TrueStorePassword", " password to file with truestore, default changeit"),
+    tsFile(true, "TrustStoreFile", " path to file with truststore, default truststore.jks"),
+    tsPass(true, "TrustStorePassword", " password to file with truststore, default changeit"),
     key(true, "Key", " path to file with key"),
     keyType(true, "KeyType", " type key, default PKCS12"),
     keyPass(true, "KeyPassword", " password to file with key"),

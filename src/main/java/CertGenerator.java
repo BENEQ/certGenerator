@@ -10,7 +10,7 @@ import java.util.Enumeration;
 
 public class CertGenerator {
 
-    private String trueStoreFile = "truestore.jks";
+    private String trueStoreFile = "truststore.jks";
     private String truestorePassword = "changeit";
     private String keyStoreFile = "keystore.jks";
     private String keyStorePassword = "changeit123!";
@@ -106,8 +106,9 @@ public class CertGenerator {
     public String getCN(String dn) {
         String[] dnArray = dn.split(",");
         for (int i = 0; i < dnArray.length; i++) {
-            if ("CN".equalsIgnoreCase(dnArray[i])) {
-                return dnArray[i+1];
+            String[] subdnArray = dnArray[i].split("=");
+            if ("CN".equalsIgnoreCase(subdnArray[0])) {
+                return subdnArray[1];
             }
         }
         return dn;
