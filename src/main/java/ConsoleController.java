@@ -42,6 +42,12 @@ public class ConsoleController {
                 case ksPass:
                     certGenerator.setKeyStorePassword(arg.getValue());
                     break;
+                case kskPass:
+                    certGenerator.setKeyStoreKeyPassword(arg.getValue());
+                    break;
+                case kskAlias:
+                    certGenerator.setKeyStoreKeyAlias(arg.getValue());
+                    break;
                 case key:
                     certGenerator.setKeyFile(arg.getValue());
                     break;
@@ -51,8 +57,12 @@ public class ConsoleController {
                 case keyPass:
                     certGenerator.setKeyPassword(arg.getValue());
                     break;
+                case keyCPass:
+                    certGenerator.setKeyClientPassword(arg.getValue());
+                    break;
                 case gks:
                     certGenerator.setGenerateKS(true);
+                    break;
                 case url:
                     URL = arg.getValue();
                     break;

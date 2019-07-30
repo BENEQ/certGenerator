@@ -8,18 +8,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
-import java.util.Enumeration;
 
-public class SSLSocetFactoryBuilder {
-    private SSLSocetFactoryBuilder builder;
+public class SSLSocketFactoryBuilder {
+    private SSLSocketFactoryBuilder builder;
     private KeyManager[] keyManagers;
 
-    public SSLSocetFactoryBuilder() {
+    public SSLSocketFactoryBuilder() {
         this.builder = this;
         this.keyManagers = null;
     }
 
-    public SSLSocetFactoryBuilder setKey(String keyFile, String keyPassword, String keyType) {
+    public SSLSocketFactoryBuilder setKey(String keyFile, String keyPassword, String keyType) {
         try (InputStream inputStream = new FileInputStream(keyFile)) {
             String algorithm = KeyManagerFactory.getDefaultAlgorithm();
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(algorithm);

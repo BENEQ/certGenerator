@@ -3,9 +3,7 @@ import sun.security.x509.X509CertImpl;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.URL;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.Enumeration;
@@ -18,9 +16,12 @@ public class CertGenerator {
     private String keyStorePassword = "changeit123!";
     private String keyType = "PKCS12";
     private String keyFile;
-    private String keyPassword;
+    private String keyPassword = "";
+    private String keyClientPassword;
+    private String keyStoreKeyAlias;
+    private String keyStoreKeyPassword;
     private boolean generateKS = false;
-    private SSLSocetFactoryBuilder sslsfb = new SSLSocetFactoryBuilder();
+    private SSLSocketFactoryBuilder sslsfb = new SSLSocketFactoryBuilder();
 
     public void setTrueStoreFile(String trueStoreFile) {
         this.trueStoreFile = trueStoreFile;
@@ -54,13 +55,36 @@ public class CertGenerator {
         this.generateKS = generateKS;
     }
 
-    public void generateCertificates(String aURL) {
+    public void setKeyClientPassword(String keyClientPassword) {
+        this.keyClientPassword = keyClientPassword;
+    }
+
+    public void setKeyStoreKeyAlias(String keyStoreKeyAlias) {
+        this.keyStoreKeyAlias = keyStoreKeyAlias;
+    }
+
+    public void setKeyStoreKeyPassword(String keyStoreKeyPassword) {
+        this.keyStoreKeyPassword = keyStoreKeyPassword;
+    }
+
+    private void initParamDefault() {
+        if (keyClientPassword == null) {
+            keyClientPassword = keyPassword;
+        }
+        if (keyStoreKeyPassword == null) {
+            keyStoreKeyPassword = keyPassword;
+        }
         if (generateKS) {
             saveKeyInFile();
         }
         if (keyFile != null && keyPassword != null) {
             sslsfb.setKey(keyFile, keyPassword, keyType);
         }
+
+    }
+
+    public void generateCertificates(String aURL) {
+        initParamDefault();
 
         HttpsURLConnection conn = null;
         try {
@@ -79,16 +103,27 @@ public class CertGenerator {
 
     }
 
+    public String getCN(String dn) {
+        String[] dnArray = dn.split(",");
+        for (int i = 0; i < dnArray.length; i++) {
+            if ("CN".equalsIgnoreCase(dnArray[i])) {
+                return dnArray[i+1];
+            }
+        }
+        return dn;
+    }
+
     public void saveCertInFile(Certificate[] listCerts) {
         try {
             KeyStore keystore = KeyStore.getInstance("JKS");
             keystore.load(null, null);
 
             for (Certificate cert : listCerts) {
-                String subjectDN = ((X509CertImpl) cert).getSubjectDN().getName();
 
+                String subjectDN = ((X509CertImpl) cert).getSubjectDN().getName();
                 String issuerDN = ((X509CertImpl) cert).getIssuerDN().getName();
-                String nameCert = subjectDN.split(",")[0].split("=")[1] + "(" + issuerDN.split(",")[0].split("=")[1] + ")";
+
+                String nameCert = getCN(subjectDN) + " (" + getCN(issuerDN) + ")";
                 keystore.setCertificateEntry(nameCert, cert);
             }
 
@@ -120,7 +155,8 @@ public class CertGenerator {
 
             while (aliases.hasMoreElements()) {
                 String alias = aliases.nextElement();
-                keyStoreOut.setCertificateEntry(alias, keyStore.getCertificate(alias));
+                Key key = keyStore.getKey(alias, keyClientPassword.toCharArray());
+                keyStoreOut.setKeyEntry((keyStoreKeyAlias == null ? alias : keyStoreKeyAlias), key, keyStoreKeyPassword.toCharArray(), keyStore.getCertificateChain(alias));
             }
 
             FileOutputStream out = new FileOutputStream(keyStoreFile);
@@ -135,6 +171,8 @@ public class CertGenerator {
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
             e.printStackTrace();
         }
     }
