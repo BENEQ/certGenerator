@@ -12,8 +12,17 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
 public class CertGenerator {
-    private String outKeyStoreName = "keystore.jks";
-    private String keystorePassword = "changeit";
+
+    private String outTrueStoreName = "keystore.jks";
+    private String truestorePassword = "changeit";
+
+    public void setOutTrueStoreName(String outTrueStoreName) {
+        this.outTrueStoreName = outTrueStoreName;
+    }
+
+    public void setTruestorePassword(String truestorePassword) {
+        this.truestorePassword = truestorePassword;
+    }
 
     public void generateCertificates(String aURL) {
 
@@ -46,8 +55,8 @@ public class CertGenerator {
                 i++;
             }
 
-            FileOutputStream out = new FileOutputStream(outKeyStoreName);
-            keystore.store(out, keystorePassword.toCharArray());
+            FileOutputStream out = new FileOutputStream(outTrueStoreName);
+            keystore.store(out, truestorePassword.toCharArray());
             out.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
