@@ -2,19 +2,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConsoleController {
-    public List<Argument> cutsArguments(String[] args){
+    public List<Argument> cutsArguments(String[] args) {
         List<Argument> arguments = new ArrayList<>();
-        for(int i=0;i<args.length;){
-            if("-".equals(args[i].substring(0,1))){
+        for (int i = 0; i < args.length; ) {
+            if ("-".equals(args[i].substring(0, 1))) {
                 Argument arg = new Argument();
                 arg.setName(NameArgument.valueOf(args[i].substring(1)));
                 i++;
-                if(arg.getName().isValue()){
+                if (arg.getName().isValue()) {
                     arg.setValue(args[i]);
                     i++;
                 }
                 arguments.add(arg);
-            }else {
+            } else {
                 Argument arg = new Argument();
                 arg.setName(NameArgument.url);
                 arg.setValue(args[i]);
@@ -25,25 +25,50 @@ public class ConsoleController {
         return arguments;
     }
 
-    public void execute(List<Argument> listTask){
-        CertGenerator certGenerator=new CertGenerator();
-        String URL=null;
-        for (Argument arg:listTask){
-            switch(arg.getName()){
-                case tsname:
-                    certGenerator.setOutTrueStoreName(arg.getValue());
+    public void execute(List<Argument> listTask) {
+        CertGenerator certGenerator = new CertGenerator();
+        String URL = null;
+        for (Argument arg : listTask) {
+            switch (arg.getName()) {
+                case tsFile:
+                    certGenerator.setTrueStoreFile(arg.getValue());
                     break;
-                case tspass:
+                case tsPass:
                     certGenerator.setTruestorePassword(arg.getValue());
                     break;
+                case ksFile:
+                    certGenerator.setKeyStoreFile(arg.getValue());
+                    break;
+                case ksPass:
+                    certGenerator.setKeyStorePassword(arg.getValue());
+                    break;
                 case key:
+                    certGenerator.setKeyFile(arg.getValue());
+                    break;
                 case keyType:
+                    certGenerator.setKeyType(arg.getValue());
+                    break;
+                case keyPass:
+                    certGenerator.setKeyPassword(arg.getValue());
+                    break;
+                case gks:
+                    certGenerator.setGenerateKS(true);
                 case url:
                     URL = arg.getValue();
                     break;
+                case help:
+                    printCommand();
+                    return;
             }
         }
         certGenerator.generateCertificates(URL);
 
+    }
+
+    private void printCommand() {
+        System.out.println("All arguments:");
+        for(NameArgument arg:NameArgument.values()){
+            System.out.println("-"+arg.name()+(arg.isValue()?" [...]":" flag")+"    - "+arg.getFullName()+" - "+arg.getDescription());
+        }
     }
 }
