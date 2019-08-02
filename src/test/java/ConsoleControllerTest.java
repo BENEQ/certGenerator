@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 class ConsoleControllerTest {
 
     @Test
-    void cutsArgumentsTest1() {
+    void cutsArgumentsTest1() throws CertGenException {
         String[] givenArgs = {"-key", "path/to/key"};
         List<Argument> expectedList = new ArrayList<>();
         expectedList.add(new Argument(NameArgument.key, "path/to/key"));
@@ -20,7 +20,7 @@ class ConsoleControllerTest {
     }
 
     @Test
-    void cutsArgumentsTest2() {
+    void cutsArgumentsTest2() throws CertGenException {
         String[] givenArgs = {"-key", "path/to/key", "http://google.pl"};
         List<Argument> expectedList = new ArrayList<>();
         expectedList.add(new Argument(NameArgument.key, "path/to/key"));
@@ -33,7 +33,7 @@ class ConsoleControllerTest {
     }
 
     @Test
-    void cutsArgumentsTest3() {
+    void cutsArgumentsTest3() throws CertGenException {
         String[] givenArgs = {"http://google.pl", "-key", "path/to/key"};
         List<Argument> expectedList = new ArrayList<>();
         expectedList.add(new Argument(NameArgument.url, "http://google.pl"));
@@ -46,7 +46,7 @@ class ConsoleControllerTest {
     }
 
     @Test
-    void cutsArgumentsTest4() {
+    void cutsArgumentsTest4() throws CertGenException {
         String[] givenArgs = {"-key", "path/to/key", "-keyType", "JKS", "http://google.pl"};
         List<Argument> expectedList = new ArrayList<>();
         expectedList.add(new Argument(NameArgument.key, "path/to/key"));
@@ -60,7 +60,7 @@ class ConsoleControllerTest {
     }
 
     @Test
-    void cutsArgumentsTest5() {
+    void cutsArgumentsTest5() throws CertGenException {
         String[] givenArgs = {"-key", "path/to/key", "http://google.pl", "-keyType", "JKS"};
         List<Argument> expectedList = new ArrayList<>();
         expectedList.add(new Argument(NameArgument.key, "path/to/key"));
@@ -74,7 +74,7 @@ class ConsoleControllerTest {
     }
 
     @Test
-    void cutsArgumentsTest6() {
+    void cutsArgumentsTest6() throws CertGenException {
         String[] givenArgs = {"-key", "path/to/key", "-url", "http://google.pl", "-keyType", "JKS"};
         List<Argument> expectedList = new ArrayList<>();
         expectedList.add(new Argument(NameArgument.key, "path/to/key"));
@@ -88,7 +88,7 @@ class ConsoleControllerTest {
     }
 
     @Test
-    void cutsArgumentsTest7() {
+    void cutsArgumentsTest7() throws CertGenException {
         String[] givenArgs = {"-key", "path/to/key", "-gks", "http://google.pl"};
         List<Argument> expectedList = new ArrayList<>();
         expectedList.add(new Argument(NameArgument.key, "path/to/key"));
