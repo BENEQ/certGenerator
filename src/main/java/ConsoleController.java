@@ -2,12 +2,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConsoleController {
-    public List<Argument> cutsArguments(String[] args) {
+    public List<Argument> cutsArguments(String[] args) throws CertGenException {
         List<Argument> arguments = new ArrayList<>();
         for (int i = 0; i < args.length; ) {
             if ("-".equals(args[i].substring(0, 1))) {
                 Argument arg = new Argument();
-                arg.setName(NameArgument.valueOf(args[i].substring(1)));
+                try {
+                    arg.setName(NameArgument.valueOf(args[i].substring(1)));
+                } catch (IllegalArgumentException e) {
+                    throw new CertGenException("Niepoprawne polecenie " + args[i], e);
+                }
                 i++;
                 if (arg.getName().isValue()) {
                     arg.setValue(args[i]);
@@ -25,7 +29,7 @@ public class ConsoleController {
         return arguments;
     }
 
-    public void execute(List<Argument> listTask) {
+    public void execute(List<Argument> listTask) throws CertGenException {
         CertGenerator certGenerator = new CertGenerator();
         String URL = null;
         for (Argument arg : listTask) {
@@ -72,13 +76,13 @@ public class ConsoleController {
             }
         }
         certGenerator.generateCertificates(URL);
-
+        System.out.printf("Zapis certyfikatow do pliku przbiegl pomyslnie.");
     }
 
     private void printCommand() {
-        System.out.println("All arguments:");
-        for(NameArgument arg:NameArgument.values()){
-            System.out.println("-"+arg.name()+(arg.isValue()?" [...]":" flag")+"    - "+arg.getFullName()+" - "+arg.getDescription());
+        System.out.printf("All arguments:%n");
+        for (NameArgument arg : NameArgument.values()) {
+            System.out.printf("-%-9s %-8s %s - %s%n", arg.name(), (arg.isValue() ? " [...]" : " flag"), arg.getFullName(), arg.getDescription());
         }
     }
 }

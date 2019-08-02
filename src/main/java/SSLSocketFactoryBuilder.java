@@ -18,7 +18,7 @@ public class SSLSocketFactoryBuilder {
         this.keyManagers = null;
     }
 
-    public SSLSocketFactoryBuilder setKey(String keyFile, String keyPassword, String keyType) {
+    public SSLSocketFactoryBuilder setKey(String keyFile, String keyPassword, String keyType) throws CertGenException {
         try (InputStream inputStream = new FileInputStream(keyFile)) {
             String algorithm = KeyManagerFactory.getDefaultAlgorithm();
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(algorithm);
@@ -28,30 +28,30 @@ public class SSLSocketFactoryBuilder {
             keyManagerFactory.init(keyStore, keyPassword.toCharArray());
             keyManagers = keyManagerFactory.getKeyManagers();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (KeyStoreException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (CertificateException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (UnrecoverableKeyException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         }
         return builder;
     }
 
-    public SSLSocketFactory build() {
+    public SSLSocketFactory build() throws CertGenException {
         SSLContext context = null;
         try {
             context = SSLContext.getInstance("TLSv1.2");
             context.init(keyManagers, null, null);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (KeyManagementException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         }
         return context.getSocketFactory();
     }

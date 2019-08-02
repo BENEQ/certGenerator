@@ -67,7 +67,7 @@ public class CertGenerator {
         this.keyStoreKeyPassword = keyStoreKeyPassword;
     }
 
-    private void initParamDefault() {
+    private void initParamDefault() throws CertGenException {
         if (keyClientPassword == null) {
             keyClientPassword = keyPassword;
         }
@@ -83,7 +83,7 @@ public class CertGenerator {
 
     }
 
-    public void generateCertificates(String aURL) {
+    public void generateCertificates(String aURL) throws CertGenException {
         initParamDefault();
 
         HttpsURLConnection conn = null;
@@ -94,10 +94,11 @@ public class CertGenerator {
 
             conn.connect();
             Certificate[] certs = conn.getServerCertificates();
+            System.out.printf("Serwer przy request na URL %s przedstawia sie %s certyfikatami.%n", aURL, certs.length);
             saveCertInFile(certs);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage());
         }
 
 
@@ -107,14 +108,15 @@ public class CertGenerator {
         String[] dnArray = dn.split(",");
         for (int i = 0; i < dnArray.length; i++) {
             String[] subdnArray = dnArray[i].split("=");
-            if ("CN".equalsIgnoreCase(subdnArray[0])) {
+            if ("CN".equalsIgnoreCase(subdnArray[0].trim())) {
                 return subdnArray[1];
             }
         }
         return dn;
     }
 
-    public void saveCertInFile(Certificate[] listCerts) {
+    public void saveCertInFile(Certificate[] listCerts) throws CertGenException {
+        System.out.printf("Zapisuje certyfikaty serwera do pliku %s:%n", trueStoreFile);
         try {
             KeyStore keystore = KeyStore.getInstance("JKS");
             keystore.load(null, null);
@@ -126,25 +128,27 @@ public class CertGenerator {
 
                 String nameCert = getCN(subjectDN) + " (" + getCN(issuerDN) + ")";
                 keystore.setCertificateEntry(nameCert, cert);
+                System.out.printf("    %s%n", nameCert);
             }
 
             FileOutputStream out = new FileOutputStream(trueStoreFile);
             keystore.store(out, truestorePassword.toCharArray());
             out.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (CertificateException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (KeyStoreException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         }
     }
 
-    public void saveKeyInFile() {
+    public void saveKeyInFile() throws CertGenException {
+        System.out.printf("Zapisuje klucz klienta do pliku %s%n", keyStoreFile);
         try (InputStream inputStream = new FileInputStream(keyFile)) {
             KeyStore keyStore = KeyStore.getInstance(keyType);
             keyStore.load(inputStream, keyPassword.toCharArray());
@@ -164,17 +168,17 @@ public class CertGenerator {
             keyStoreOut.store(out, keyStorePassword.toCharArray());
             out.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (CertificateException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (KeyStoreException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         } catch (UnrecoverableKeyException e) {
-            e.printStackTrace();
+            throw new CertGenException(e.getMessage(), e);
         }
     }
 }
